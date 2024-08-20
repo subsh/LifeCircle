@@ -1,8 +1,10 @@
 package com.lifecircle.community;
 
 import com.lifecircle.community.dao.DiscussPostMapper;
+import com.lifecircle.community.dao.LoginTicketMapper;
 import com.lifecircle.community.dao.UserMapper;
 import com.lifecircle.community.entity.DiscussPost;
+import com.lifecircle.community.entity.LoginTicket;
 import com.lifecircle.community.entity.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,9 @@ public class MapperTests {
 
     @Autowired
     private DiscussPostMapper discussPostMapper;
+
+    @Autowired
+    private LoginTicketMapper loginTicketMapper;
 
     @Test
     public void testSelectUser(){
@@ -58,5 +63,16 @@ public class MapperTests {
 
         int rows = discussPostMapper.selectDiscussPostRows(0);
         System.out.println(rows);
+    }
+
+    @Test
+    public void testInsertLoginTicket(){
+        LoginTicket loginTicket = new LoginTicket();
+        loginTicket.setUserId(101);
+        loginTicket.setTicket("abc");
+        loginTicket.setStatus(0);
+        loginTicket.setExpired(new Date(System.currentTimeMillis() + 1000 * 60 * 60));
+
+        loginTicketMapper.insertLoginTicket(loginTicket);
     }
 }
