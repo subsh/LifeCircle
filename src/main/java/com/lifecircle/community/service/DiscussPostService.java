@@ -2,8 +2,10 @@ package com.lifecircle.community.service;
 
 import com.lifecircle.community.dao.DiscussPostMapper;
 import com.lifecircle.community.entity.DiscussPost;
+import com.lifecircle.community.util.SensitiveFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.util.HtmlUtils;
 
 import java.util.List;
 
@@ -13,12 +15,31 @@ public class DiscussPostService {
     @Autowired
     private DiscussPostMapper discussPostMapper;
 
+    @Autowired
+    private SensitiveFilter sensitiveFilter;
+
     public List<DiscussPost> findDiscussPosts(int userId, int offset, int limit){
         return discussPostMapper.selectDiscussPosts(userId, offset, limit);
     }
 
     public int findDiscussPostRows(int userId){
         return discussPostMapper.selectDiscussPostRows(userId);
+    }
+
+    public int addDiscussPost(DiscussPost post){
+        if(post == null){
+            throw new IllegalArgumentException("参数不能为空！");
+        }
+
+        // 转义HTML标记，将标签(<script></script>)转义成普通文本
+        post.setTitle(HtmlUtils.htmlEscape(post.getTitle()));
+        post.setContent(HtmlUtils.htmlEscape(post.getContent()));
+
+        // 过滤敏感词
+        post.setTitle(sensitiveFilter.filter(post.getTitle()));
+        post.setContent(sensitiveFilter.filter(post.getContent()));
+
+        return discussPostMapper.insertDiscussPost(post);
     }
 
 }

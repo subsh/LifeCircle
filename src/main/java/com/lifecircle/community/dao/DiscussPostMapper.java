@@ -15,4 +15,6 @@ public interface DiscussPostMapper {
     // 该方法是查询帖子总数量，@Param注解用来给参数起别名，如果需要动态的拼接条件(比如再<if>里使用)，并且这个方法只有一个参数，那必须起别名
     int selectDiscussPostRows(@Param("userId") int userId);
 
+    int insertDiscussPost(DiscussPost discussPost);
+
 }
