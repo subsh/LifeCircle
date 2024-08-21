@@ -2,6 +2,7 @@ package com.lifecircle.community.controller;
 
 import com.lifecircle.community.annotation.LoginRequired;
 import com.lifecircle.community.entity.User;
+import com.lifecircle.community.service.FollowService;
 import com.lifecircle.community.service.LikeService;
 import com.lifecircle.community.service.UserService;
 import com.lifecircle.community.util.CommunityConstant;
@@ -49,6 +50,9 @@ public class UserController implements CommunityConstant {
 
     @Autowired
     private LikeService likeService;
+
+    @Autowired
+    private FollowService followService;
 
     @LoginRequired
     @RequestMapping(path = "/setting", method = RequestMethod.GET)
@@ -170,6 +174,18 @@ public class UserController implements CommunityConstant {
         int likeCount = likeService.findUserLikeCount(userId);
         model.addAttribute("likeCount", likeCount);
 
+        // 关注数量
+        long followeeCount = followService.findFolloweeCount(userId, ENTITY_TYPE_USER);
+        model.addAttribute("followeeCount", followeeCount);
+        // 粉丝数量
+        long followerCount = followService.findFollowerCount(ENTITY_TYPE_USER, userId);
+        model.addAttribute("followerCount", followerCount);
+        // 是否已关注某个实体
+        boolean hasFollowed = false;
+        if(hostHolder.getUser() != null){
+            hasFollowed = followService.hasFollowed(hostHolder.getUser().getId(), ENTITY_TYPE_USER, userId);
+        }
+        model.addAttribute("hasFollowed", hasFollowed);
 
         return "/site/profile";
     }
