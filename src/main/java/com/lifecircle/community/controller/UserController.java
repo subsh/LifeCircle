@@ -2,6 +2,7 @@ package com.lifecircle.community.controller;
 
 import com.lifecircle.community.annotation.LoginRequired;
 import com.lifecircle.community.entity.User;
+import com.lifecircle.community.service.LikeService;
 import com.lifecircle.community.service.UserService;
 import com.lifecircle.community.util.CommunityConstant;
 import com.lifecircle.community.util.CommunityUtil;
@@ -45,6 +46,9 @@ public class UserController implements CommunityConstant {
 
     @Autowired
     private HostHolder hostHolder;
+
+    @Autowired
+    private LikeService likeService;
 
     @LoginRequired
     @RequestMapping(path = "/setting", method = RequestMethod.GET)
@@ -150,6 +154,24 @@ public class UserController implements CommunityConstant {
         userService.logout(ticket);
 
         return "redirect:/login";
+    }
+
+    // 个人主页
+    @RequestMapping(path = "/profile/{userId}", method = RequestMethod.GET)
+    public String getProfilePage(@PathVariable("userId") int userId, Model model){
+        User user = userService.findUserById(userId);
+        if(user == null){
+            throw new RuntimeException("该用户不存在！");
+        }
+
+        // 用户
+        model.addAttribute("user", user);
+        // 点赞数量
+        int likeCount = likeService.findUserLikeCount(userId);
+        model.addAttribute("likeCount", likeCount);
+
+
+        return "/site/profile";
     }
 
 }
